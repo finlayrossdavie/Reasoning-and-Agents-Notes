@@ -1,0 +1,102 @@
+\documentclass{article}
+
+% Language setting
+% Replace `english' with e.g. `spanish' to change the document language
+\usepackage[english]{babel}
+
+% Set page size and margins
+% Replace `letterpaper' with `a4paper' for UK/EU standard size
+\usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+
+% Useful packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+
+\title{Reasoning and Agents}
+\author{Finlay Ross-Davie}
+
+\begin{document}
+\maketitle
+
+
+\section{Intelligent Agents}
+
+\subsection{Definition of agents and environments}
+
+An \textbf{Agent} is anything that can be viewed as perceiving its environment through \textbf{sensors} and acting upon that environment through \textbf{actuators} \newline. 
+
+\textbf{Percept} is a term used to refer to the agent's perceptual inputs at any given instant. An agent's 
+
+\textbf{percept sequence} is the complete history of everything the agent has ever perceived \newline
+
+An agent's choice of action at any given instant can depend on the entire percept sequence observed, but not anything it hasn't perceived.
+
+An agent's behavior is described, mathematically speaking, by the \textbf{agent function} that maps any given percept sequence to an action.
+
+The agent function for an artificial agent will be implemented by an \textbf{agent program}.
+
+i.e, The agent program is an abstract mathematical description; the agent program is a concrete implementation, running within some physical system 
+
+\subsection{The Concept of rationality}
+
+A \textbf{performance measure} evaluates any given sequence of environment states to capture whether the agent has performed well.
+
+In general, it is better to design performance measures according too what one actually wants in the environment, rather than according to how one thinks the agent should behave. \newline
+
+What is rational at any given time depends on four things:
+\begin{itemize}
+\item The performance measure that defined the criterion of success
+\item The agents prior knowledge of the environment
+\item The actions that the agent can perform
+\item The agent's percept sequence to date.
+
+\end{itemize}
+
+The definition of a \textbf{rational agent}:
+
+For each possible percept sequence, a rational agent should select an action that is expected to maximize its performance measure, given the evidence provided by the percept sequence and whatever built in knowledge the agent has. \newline
+
+An \textbf{omniscient} agent knows the actual outcome of its actions and can act accordingly; but omniscience is impossible in reality.
+
+Rationality maximises expected performance
+
+To the extent that an agent relies on the prior knowledge of its designer rather than on its own percepts, we can say that the agent lacks \textbf{autonomy}. A rational agent should be autonomous - it should learn what it can to compensate for a partial or incorrect prior knowledge
+
+The \textbf{task environment} is made up of  the performance measure, the environment, and the agent's actuators and sensors. This is also referred to as the \textbf{PEAS} (Performance, Environment, Actuators, Sensors) description \newline
+
+If an agent's sensors give it access to the complete state of the environment at each point in time, then one can say that the task environment is \textbf{Fully observable}. A task environment is effectively fully observable if the sensors detect all aspects that are relevant to the choice of action; relevance, in turn depends on the performance measure. An environment might be \textbf{partially observable} because of noisy and inaccurate sensors or because parts of the state are simply missing from the sensor data \newline
+
+If the next state of the environment is completely determined by the current state and the action executed by the agent, the environment is \textbf{deterministic}; otherwise it is \textbf{stochastic}. \newline
+
+In an \textbf{episodic} task environment, the agent's experience is divided into atomic episodes. In each episode the agent receives a percept and then performs a single action. The next action does not depend on the actions taken in previous episodes. In \textbf{sequential} environments, the current decision could affect all future decisions. \newline 
+
+If the environment can change while an agent is deliberating then the environment is \textbf{dynamic} for that agent, otherwise it is \textbf{static}. \newline
+
+In a \textbf{known} environment, the outcomes (or outcome probabilities if the environment is stochastic) for all actions are given. If an environment is \textbf{unknown} the agent will have to learn how it works in order for it to make good decisions.
+
+\subsection{The structure of agents}
+
+agent = architecture + program
+
+Where \textbf{architecture} is some sort of computing device with physical sensors and actuators.
+
+Agent programs simply take the current percept as input from the sensors and return an action to the actuators. If the agent's actions need to depend on the entire percept sequence, the agent will hve to remember the percepts.
+
+One kind of agent is the \textbf{simple reflex agent}. These agents select actions on the basis of the current percept, ignoring the rest of percept history. \
+
+A \textbf{model} is a description of how the next state depends on the current state and action. A \textbf{model-based agent} is an agent that uses a model to keep track of the current state of the world, then chooses an action in the same way as the reflex agent. \newline
+
+\textbf{Goal} information describes situations that are desirable. For \textbf{Goal based agents} the agent combine program will combine this goal information with the model to choose actions that achieve the goal. \newline
+
+Goals alone are not enough to generate high-quality behaviour in most environments. An agent's \textbf{utility function} is essentially an internalization of the performance measure. If the internal utility function and the external performance measure are in agreement, then an agent that chooses actions to maximise its utility will be rational according to the external performance measure. A rational \textbf{utility-based} agent chooses the action that maximises the expected utility of the action outcomes. \newline
+
+All agents can improve their performance through \textbf{learning}. A \textbf{learning agent} can be divided into four conceptual components:
+\begin{itemize}
+    \item Critic
+    \item Learning element
+    \item Problem generator
+    \item Performance element
+\end{itemize}
+
+\end{document}
