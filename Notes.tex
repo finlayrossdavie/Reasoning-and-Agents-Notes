@@ -321,5 +321,135 @@ The most popular algorithm to make every variable arc-consistent is called AC-3 
 
 \section{Adversarial Search}
 
+\textbf{Zero-sum games} are deterministic, turn-taking and only have two players. Utilities at the end of a zero-sum game are equal and opposite (summing to 0). 
+
+\textbf{Pruning} allows us to ignore portions of the search tree that make no difference to the final choice.
+\subsubsection{Minimax}
+
+A minimax game can be formally defined as being a kind of search problem with the following elements
+\begin{itemize}
+    \item $S_0:$ The initial state
+    \item PLAYER(s): Define which player has the move in a state (MAX or MIN)
+    \item ACTIONS(s): Returns the set of legal moves in a state
+    \item RESULT(s,a): The transition model, which defines the result of a move
+    \item TERMINAL-TEST(s): A terminal test, which is true when the game is over and false otherwise
+    \item UTILITY(s,p): A utility function defines the numeric value for a game that ends in terminal state $s$ for a player $p$
+\end{itemize}
+
+The minimax value of a node is the utility for MAX of being in corresponding state
+
+\begin{equation}
+MINIMAX(s) =
+    \begin{cases}
+        UTILITY(S) & \text{if TERMINAL-TEST(s)} \\
+        max_{a \in Actions(s)}MINIMAX(RESULT(s,a)) & \text{if} PLAYER(s) = MAX \\
+        min_{a \in Actions(s)}MINIMAX(RESULT(s,a)) & \text{if} PLAYER(s) = MIN \\
+            
+    \end{cases}
+\end{equation}
+
+\begin{algorithm}
+\begin{algorithmic}
+
+\Procedure{MINIMAX-DECISION}{state}
+    \State \textbf{return} $argmax_{a \in ACTIONS_{(s)}}MIN-VALUE(RESULT(state,a))$
+\EndProcedure \newline
+
+\Procedure{MAX-VALUE}{$state$}
+    \Comment{returns a utility value}
+    \If{TERMINAL-TEST(state)}
+        \State \textbf{return} UTILITY(state)
+    \EndIf
+    \State $v \leftarrow -\infty$
+    \For{each a in ACTIONS(state)}
+        $v \leftarrow MAX(v,MIN-VALUE(RESULT(s,a)))$
+    \EndFor
+
+    \State \textbf{return} $v$ 
+\EndProcedure \newline
+
+\Procedure{MIN-Value}{$state)$}
+    \If{TERMINAL-TEST(state)}
+        \State \textbf{return} UTILITY(state)
+        \State $v \leftarrow \infty$
+    \EndIf
+    \For{each a in ACTIONS(state)}
+    \State $v \leftarrow MIN(v,MAX-VALUE(RESULT(s,a)))$
+    \EndFor
+    
+    \State return $v$
+
+\EndProcedure
+
+\end{algorithmic}
+\end{algorithm}
+
+Minimax has the following properties:
+\begin{itemize}
+    \item \textbf{Complete}
+    \item \textbf{Time complexity} of $O(b^m)$
+    \item \textbf{Space complexity} of $O(bm)$
+    \item \textbf{Optimal}
+\end{itemize}
+
+\subsubsection{Alpha-Beta Pruning}
+
+Alpha-Beta pruning is applied to a standard minimax tree, returns the same move as minimax would be prunes away branches that cannot possibly influence the final decision.
+
+The general principle of a-b pruning is to consider a node $n$ somewhere in the tree, such that Player has a choice of moving to that node. If Player has a better choice $m$ either at the parent node of $n$ or at any point further up, then $n$ will never be reached in actual play and thus we can just prune it.
+
+\begin{itemize}
+    \item $\alpha$ is the value of the best (highest) choice found so far along the path for MAX
+    \item $\beta$ is the value of the best (lowest) choice found so far along the path for MIN
+\end{itemize}
+
+\begin{algorithm}
+\begin{algorithmic}
+
+\Procedure{ALPHA-BETA-SEARCH}{state}
+    \State $v \leftarrow$ MAX-VALUE($state,-\infty , +\infty$)
+    \State \textbf{return} the action in ACTIONS(state) with value $v$
+\EndProcedure \newline
+
+\Procedure{MAX-VALUE}{$state,\alpha,\beta$}
+    \Comment{returns a utility value}
+    \If{CUTOFF-TEST(state,depth)}
+        \State \textbf{return} EVAL(state)
+    \EndIf
+    \State $v \leftarrow -\infty$
+    \For{each a in ACTIONS(state)}
+        $v \leftarrow MAX(v,MIN-VALUE(RESULT(s,a),\alpha,\beta))$
+        \If{$v \geq \beta$}
+        \textbf{return} v
+        \EndIf
+        \State $\alpha \leftarrow MAX(\alpha,v)$
+    \EndFor
+
+    \State \textbf{return} $v$ 
+\EndProcedure \newline
+
+\Procedure{MIN-Value}{$state,\alpha,\beta$}
+    \If{CUTOFF-TEST(state)}
+        \State \textbf{return} EVAL(state)
+        \State $v \leftarrow \infty$
+    \EndIf
+    \For{each a in ACTIONS(state)}
+    \State $v \leftarrow MIN(v,MAX-VALUE(RESULT(s,a),\alpha,\beta))$
+    \If{$v \leq \alpha$}
+        \State return $v$
+       
+    \EndIf
+    \State $\beta \leftarrow MIN(\beta, v)$
+    \EndFor
+    
+    \State \textbf{return} $v$
+
+\EndProcedure
+
+\end{algorithmic}
+\end{algorithm}
+
+
+CUTOFF-TEST returns true for all depth greater than d and all terminal states just as Terminal-Test
 
 \end{document}
