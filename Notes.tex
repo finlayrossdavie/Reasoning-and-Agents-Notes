@@ -3,11 +3,18 @@
 % Language setting
 % Replace `english' with e.g. `spanish' to change the document language
 \usepackage[english]{babel}
+\usepackage{geometry}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
 
 % Set page size and margins
 % Replace `letterpaper' with `a4paper' for UK/EU standard size
-\usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
-
+ \geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+ }
 % Useful packages
 \usepackage{amsmath}
 \usepackage{graphicx}
@@ -45,11 +52,12 @@ A \textbf{performance measure} evaluates any given sequence of environment state
 In general, it is better to design performance measures according too what one actually wants in the environment, rather than according to how one thinks the agent should behave. \newline
 
 What is rational at any given time depends on four things:
+
 \begin{itemize}
-\item The performance measure that defined the criterion of success
-\item The agents prior knowledge of the environment
-\item The actions that the agent can perform
-\item The agent's percept sequence to date.
+    \item The performance measure that defined the criterion of success
+    \item The agents prior knowledge of the environment
+    \item The actions that the agent can perform
+    \item The agent's percept sequence to date.
 
 \end{itemize}
 
@@ -98,5 +106,220 @@ All agents can improve their performance through \textbf{learning}. A \textbf{le
     \item Problem generator - Responsible for suggesting actions that will lead to new and informative experiences
     \item Performance element - Responsible for selecting external actions
 \end{itemize}
+
+\section{Search Problems}
+
+A search strategy is defined by picking the order of node expansion
+Nodes are taken from the frontier. 
+
+\subsection{Uninformed search}
+
+\textbf{Uninformed search} strategies have no additional information about states beyond that provided in the problem definition. 
+
+\subsubsection{Breadth-first search}
+
+Breadth-first search is a strategy in which all the nodes are expanded at a given depth in the search tree before any nodes at the next level are expanded. 
+
+This is implemented by using a FIFO queue for the frontier. This leads to new nodes going to the back of the queue, and old nodes, getting expanded first. 
+
+This search strategy:
+\begin{itemize}
+    \item Is \textbf{Complete} is b is finite
+    \item Has \textbf{time complexity} of $b+b^2+b^3 \ldots +b^d = O(b^d)$ in the worst case
+    \item Has \textbf{space complexity} of $O(b^d)$ since it keeps every node in memory
+    \item Is \textbf{Optimal} if cost = 1 per step
+\end{itemize}
+
+\subsubsection{Depth-first search}
+
+Depth-first search is a strategy in which the deepest unexpanded node is expanded. 
+This is implemented using a LIFO queue. This leads to new successors going at the front. 
+
+This search strategy:
+\begin{itemize}
+    \item Is \textbf{not complete} since it fails in infinite-depth and spaces with loops
+    \item Has \textbf{time complexity} of $O(b^m)$ 
+    \item Has \textbf{space complexity} of $O(bm)$ linear since explored nodes with no descendants in the frontier are removed from memory
+    \item Is \textbf{not optimal}
+\end{itemize}
+
+\textbf{Depth-limited} search is a implementation with a depth limit l, i.e., nodes at depth l have no successors
+
+This search strategy:
+\begin{itemize}
+    \item Is \textbf{not complete} 
+    \item Has \textbf{time complexity} of $O(b^l)$ 
+    \item Has \textbf{space complexity} of $O(bl)$ linear since explored nodes with no descendants in the frontier are removed from memory
+    \item Is \textbf{not optimal}
+\end{itemize}
+
+\subsubsection{Iterative deepening search}
+
+Iterative deepening search is a strategy used in combination with depth-first search, that finds the best depth limit. It gradually increases the limit (0, 1,..) until a goal is found. This will occur when the depth limit reaches d, the depth of the shallowest goal node. . 
+
+This search strategy:
+\begin{itemize}
+    \item Is \textbf{complete} 
+    \item Has \textbf{time complexity} of $O(b^d)$ 
+    \item Has \textbf{space complexity} of $O(bd)$
+    \item Is \textbf{optimal} if step cost is 1
+\end{itemize}
+
+\subsection{Informed Search}
+
+An informed search strategy is one that uses problem-specific knowledge beyond the definition of the problem itself.
+
+\textbf{Best-first search} is an instance of the general TREE-SEARCH or GRAPH SEARCH algorithm. In best-first search a node is selected for expansion based on an \textbf{evaluation function}, $f(n)$, the evaluation function is construed as a cost estimate so the node with the lowest evaluation is expanded first. 
+Most best-first algorithms include a \textbf{heuristic function}, $h(b)$. $h(n)$ estimates the cost of the cheapest path from state at node n to a goal state.  
+
+A heuristic $h(n)$ is \textbf{admissible} if for every node n: $$h(n) \leq h^*(n)$$ where $h^*(n)$ is the true cost to reach the goal state from n 
+
+An admissible heuristic never overestimates the cost to reach the goal i.e., it is optimistic. 
+
+A heuristic $h(n)$ is \textbf{consistent} if for every node n, every successor n' of n generated by any action a: $$h(n) \leq c(n, a, n') + h(n')$$ 
+
+
+\subsubsection{Greedy best-first search}
+
+Greedy best-first search tries to expand the node that is closest to the goal.
+
+The evaluation function is simply the heuristic $$f(n) = h(n)$$
+
+This search strategy:
+\begin{itemize}
+    \item Is \textbf{not complete} since it can get stuck in loops
+    \item Has \textbf{time complexity} of $O(b^m)$ 
+    \item Has \textbf{space complexity} of $O(b^m)$ since it keeps all nodes in memory
+    \item Is \textbf{not optimal}
+\end{itemize}
+
+\subsubsection{A* Search}
+
+A* search evaluates nodes by combining $g(n)$, the cost to reach the node, and $h(n)$, the cost to get from the node to the goal.
+
+The evaluation function is given as $$f(n) = g(n) + h(n)$$
+
+If $h(n)$ is admissible, A* using TREE-SEARCH is optimal
+
+If $h(n)$ is consistent, A* using GRAPH-SEARCH is optimal \newline
+
+This search strategy:
+\begin{itemize}
+    \item Is \textbf{Complete} unless there are infinitely many nodes with $f \leq f(G)$
+    \item Has exponential \textbf{time complexity}
+    \item Keeps all nodes in memory
+    \item Is \textbf{optimal}
+\end{itemize}
+
+\subsection{Smart Search using constraints}
+
+A \textbf{constraint satisfaction problem} consists of a set of \textbf{variables} X = ${X_1,\ldots,X_n}$, a set of \textbf{domains},$D = {D_1,\ldots,D_n}$ where each domain $D_i$ is a set of possible values for variable $X_i$ and a set of \textbf{constraints} C that specify acceptable combinations of values where each $c \in C$ consists of a \textbf{scope}, tuple of variables involved in the constraint and a \textbf{relation} that defines the values that the variables can take.
+
+Varieties of constrains:
+\begin{itemize}
+    \item \textbf{Unary} constraints involve a single variable
+    \item \textbf{Binary} constraints involve pairs of variables
+    \item \textbf{Higher-order} constraints involve 3 or more variables
+    \item \textbf{Global} constraints involve an arbitrary number of variables
+\end{itemize}
+
+A variable in a CSP is \textbf{arc-consistent} if every value in its domain satisfies the variables binary constraints. 
+More formally, $X_i$ is arc-consistent with respect to another variable $X_j$ if for every value in the current domain $D_i$ there is some value in the domain $D_j$ that satisfies the binary constrain on the arc $(X_i,X_)$
+
+All CSPs are \textbf{commutative}. A problem is commutative if the order of application of any given set of actions has no effect on the outcome. When assigning values to variables in CSPs, we reach the same partial assignment regardless of order. We only need to consider assignments to a single variable at each node
+
+\subsubsection{Backtracking search}
+
+The term \textbf{backtracking search} is used for a depth-first search that chooses values for one variable at a time and backtracks when a variable has no legal values left to assign.
+
+In simple terms backtracking works by choosing a variable, assigning a value to it, and then recursively trying to solve the rest of the problem.
+
+\begin{algorithm}
+\begin{algorithmic}
+
+\Procedure{BacktrackingSearch}{$csp$}
+    \Comment{returns a solution or failure}
+    \State return Backtrack($[],csp$)
+\EndProcedure
+
+\Procedure{Backtrack}{$(assignment,csp)$}
+
+\If{$assignment$ is complete}
+    \State return $assignment$
+\EndIf
+\State $var \leftarrow$ SELECT-UNASSIGNED-VARIABLE$(csp)$
+\For{\State each value in ORDER-DOMAIN-VALUES($var,assignment,csp$)}
+
+    \If{$value$ is consistent with $assignment$}
+        \State add {$var = value$} to $assignment$
+        \State $inferences \leftarrow$ INFERENCE($csp,var,value$)
+        \If{$inferences \neq failure$}
+            \State add $inferences$ to $assignment$
+            \State $result \leftarrow $ BACKTRACK($assignment,csp$)
+                    \If{$result \neq failure$}
+                        \State return result
+                    \EndIf
+                \EndIf
+            \EndIf
+    \State return $result$
+
+\EndFor
+
+\State return $failure$
+
+\EndProcedure
+
+\end{algorithmic}
+\end{algorithm}
+
+Variable ordering in backtracking-search (SELECT-UNASSIGNED-VARIABLE) can be decided in various manners to garner gains in speed. The \textbf{most constrained variable} technique chooses the variable with the fewest legal values, this reduces branching. \newline
+
+Value ordering (ORDER-DOMAIN-VALUES)can be done using various techniques such as \textbf{least constraining value} which chooses the value that rules out the fewest values in the remaining variables for a given variable. \newline 
+
+Inference (INFERENCE) allows one to potentially detect inevitable failure early. For example, \textbf{forward checking} keeps track of remaining legal values for unassigned variables and terminates the search when any variable has no legal values. Another form of inference, \textbf{constraint propagation} repeatedly enforces constrains locally . \newline \textbf{Arc consistency} checks if there is a value for X that makes the domain of Y empty before or after each assignment. The simplest form of propagation makes each arc consistent.
+
+The most popular algorithm to make every variable arc-consistent is called AC-3 which maintains a queue of arcs to consider. Initially, the queue contains all the arcs in the CSP. AC-3 then pops off an arbitrary arc $(X_i,X_j)$ from the queue and makes $X_i$ arc-consistent with respect to $X_j$. If this leaves $D_i$ unchanged, the algorithm just moves on to the next arc. If this makes $D_i$ smaller, then all arc $(X_k,X_i)$ where $X_k$ is a neighbor of $X_i$ are added to the queue since the change in $D_i$ might enable further reductions in the domains of $D_k$. If $D_i$ is revised down to nothing, the CSP has no consistent solution and AC-3 can return failure
+
+
+\begin{algorithm}
+\begin{algorithmic}
+
+\Procedure{AC-3}{$csp$}
+    \Comment{returns false if an inconsistency is found and true otherwise}
+    \While{queue is not empty}
+        \State $(X_i,X_j) \leftarrow$ REMOVE-FIRST(queue)
+        \If{REVISE($csp,X_i,X_j$)}
+            \If{size of $D_i = 0$}
+                \State \textbf{return} false
+                \For{each $X_k$ in $X_i.$NEIGHBORS - ${x_J}$}
+                    \State add $(X_k,X_i)$ to queue
+                \EndFor
+            \EndIf
+        \EndIf
+    \EndWhile 
+    \State \textbf{return} true 
+\EndProcedure
+
+\Procedure{REVISE}{$(csp, X_i,X_j)$}
+
+    \State $revised \leftarrow false$
+    \For{each $x$ in $D_i$}
+        \If{no value $y$ in $D_j$ allows $(x,y)$ to satisfy the constraint between $X_i$ and $X_j$}
+            \State delete $x$ from $D_i$
+            \State $revised \leftarrow true$
+        \EndIf
+        
+    \EndFor
+
+    \State return $revised$
+
+\EndProcedure
+
+\end{algorithmic}
+\end{algorithm}
+
+
+\section{Adversarial Search}
+
 
 \end{document}
