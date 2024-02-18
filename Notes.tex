@@ -619,19 +619,54 @@ And returns, a satisfying model or failure
 \end{algorithmic}
 \end{algorithm}
 
-\section{Resolution}
+\section{First-Order Logic}
 
-\subsection{Forward Chaining}
+The language of \textbf{First-order logic (FOL)}, is built around objects and relations.
 
-A forward-chaining algorithm starts with the atomic sentences in the knowledge base and applies Modus Ponenes in the forward direction, adding new atomic sentences, until no further inferences can be made. 
-
-Properties of forward chaining:
+FOL assumes the world contains:
 \begin{itemize}
-    \item Sound and complete for first-order definite clauses (a definite clause has exactly one positive literal)
-    \item may not terminate in general if $\alpha$ is not entailed 
-    \item Entailment with definite clauses is semi-decidable 
-    \item Datalog = first-order definite clauses + no functions (FC terminates for Datalog in finite number of iterations)
+    \item Objects (people,houses,numbers,colours)
+    \item Relations (red,round,prime,brother of)
+    \item Functions (father of, best friend, one more than, plus)
 \end{itemize}
+
+The syntax of FOL is built on the following basic elements:
+\begin{itemize}
+    \item Constants (2,UoE,Richard,..)
+    \item Predicates (Brother, $>$,$\leq$,...)
+    \item Functions (Sqrt, LeftLegOf,...)
+    \item Variables (x,y,a,b,...)
+    \item Connectives ($\neg, \Rightarrow,\vee, \wedge, \Leftrightarrow$)
+    \item Equality (=)
+    \item Quantifiers ($\forall,\exists$)
+\end{itemize}
+
+\textbf{Atomic sentences} are formed from a predicate symbol optionally followed by a parenthesized list of terms such as $Brother(Richard,John)$. This states that Richard is the brother of John.
+
+A term can be a function, constant or variable. \newline
+
+An atomic sentence is true in a given model if the relation referred to by the predicate symbol holds among the objects referred to by the arguments. \newline 
+
+\textbf{Complex formulae} are made from atomic formulae using connectives. For example, $>(1,2) \vee \leq(1,2)$ \newline
+
+\textbf{Formulae} are mapped to an \textbf{interpretation} \newline 
+An interpretation is called a model of a set of formulae when all the formulae are true for the interpretation \newline
+
+An interpretation contains objects and relations between then. Mapping is as follows:
+constant symbols $\rightarrow$ objects
+predicate symbols $\rightarrow$ relation
+function symbols $\rightarrow$ functions \newline 
+
+Universal quantification
+$\forall <variables>.<formula>$
+$\forall x.P$ is true in an interpretation m if and only if P is true with x being each possible object in the interpretation. 
+
+Existential quantification
+$\exists <variables>.<formula>$
+$\exists x. P$ is true for an interpretation m if and only if P is true with x being some possible object in the interpretation. Roughly speaking this is equivalent to the disjuntion of instantiations of P. 
+
+Equality 
+$term_1 = term_2$ is true under a given interpretation if and only if $term_1$ and $term_2$ refer to the same obect
 
 
 \end{document}
