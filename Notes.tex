@@ -17,11 +17,16 @@
  }
 % Useful packages
 \usepackage{amsmath}
+\usepackage{amssymb}
+
 \usepackage{graphicx}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 
+
+
 \title{Reasoning and Agents}
 \author{Finlay Ross-Davie}
+\date{17th January 2024}
 
 \begin{document}
 \maketitle
@@ -451,5 +456,182 @@ The general principle of a-b pruning is to consider a node $n$ somewhere in the 
 
 
 CUTOFF-TEST returns true for all depth greater than d and all terminal states just as Terminal-Test
+
+\section{Logical Agents}
+
+A \textbf{sentence} is expressed in a knowledge representation language and represents some assertion about the world. An axiom is a sentence that is taken as given without being derived from other sentences. \textbf{Syntax} is the formal structure of sentences. 
+
+\textbf{A knowledge base} is a set of sentences.
+
+Each time the agent program is called, it tells the knowledge base what is perceives, asks the knowledge base what action it should perform and then tells the knowledge base which action was chosen and the agent executes the action. 
+
+A simple knowledge-based agent is able to:
+\begin{itemize}
+    \item Represent states, actions, ect.
+    \item Incorporate new percepts
+    \item Update internal representations of the world 
+    \item Deduce hidden properties of the world 
+    \item Deduce appropriate actions
+\end{itemize}
+
+\textbf{Inference} is defined as deriving sentences from other sentences. Logical agents apply inference to a knowledge base to derive new information and make decisions. 
+
+\textbf{Entailment} means that one thing follows from another $$KB \: |= a$$, i.e. necessary truth one of one sentence given another. 
+
+Two sentences are \textbf{logically equivalent} if they are true in the same set of models. Any two sentences $\alpha$ and $\beta$ are equivalent only if each of them entails the other. 
+
+\begin{itemize}
+    \item A sentence is \textbf{valid} if it is true in all models (also known as tautologies)
+    \item A sentence is \textbf{satisfiable} if it is true in some model
+    \item A sentence is \textbf{unsatisfiable} if it is true in no models 
+\end{itemize}
+
+\begin{figure}[ht]
+\includegraphics[width=8cm]{Standard Logical Equivalences.png}
+\centering
+\end{figure}
+
+\subsubsection{Propositional Theorem Proving}
+
+\textbf{Application of inference rules}
+
+Legitimate (sound) generation of new sentences from old
+Proof is a sequence of inference rule applications (Can use inference rules as operators in a standard search algorithm)
+Typically require transformation of sentences into a normal form
+
+\textbf{Model checking}
+
+Truth table enumeration (always exponential in $n$)
+Improved backtracking
+Heuristic search in model space
+
+
+\subsubsection{Propositional Inference}
+
+There are two families of efficient algorithmns for propositional inference:
+\begin{itemize}
+    \item Complete backtracking search algorithms (DPLL algorithm)
+    \item Incomplete local search algorithms (WalkSAT algorithm)
+\end{itemize}
+
+Both of these algorithmns manipulate formulae in \textbf{conjunctive normal form(CNF)}
+
+In CNF a sentence is a conjunction of clauses whose satisfiability is to be determined. A clause is a disjuntion of literals and a literal is a proposition symbol.  \newline
+
+To convert to CNF:
+\begin{enumerate}
+    \item Eliminate $\Leftrightarrow$: replace $\alpha \Leftrightarrow \beta$ with $(\alpha \Rightarrow \beta)\wedge(\beta \Rightarrow \alpha)$
+    \item Eliminate $\Rightarrow$: replace $\alpha \Rightarrow \beta$ with $\neg \alpha \vee \beta$
+    \item Move $\neg$ inwards: use de Morgan's rules and double negation $\neg \neg a = a$
+    \item Create clauses: apply distributivity law $(\vee \: over \: \wedge)$ and flatten
+\end{enumerate}
+
+The original sentence is now in CNF, as a conjunction of clauses. 
+
+\textbf{The DPLL algorithm} determines if an input propositional logic sentence (in CNF) is satisfiable
+
+One component of DPLL is \textbf{early termination}:
+\begin{itemize}
+    \item A clause is true if one of its literals is true (E.g. if A is true then $A \vee \neg B$) is true
+    \item A sentence is false if any of its clauses is false (e.g. If, A is false and B is true then ($A \vee B$) is false, so any sentence containing it is false)
+\end{itemize}
+
+Another aspect of DPLL is \textbf{Pure symbol heuristic}
+\begin{itemize}
+    \item Pure symbol: always appears with the same polarity in all clauses
+    \item Make a literal containing a pure symbol true
+\end{itemize}
+
+The third component of DPLL is the \textbf{unit clause heuristic}
+\begin{itemize}
+    \item Unit clause: only one literal in the clause
+    \item The only literal in a unit clause must be true
+    \item Also includes clauses where all but one literal is false
+\end{itemize}
+
+
+\begin{algorithm}
+\begin{algorithmic}
+
+\Procedure{DPLL-SATISFIABLE}{$s$} 
+\Comment{inputs: a sentence in propositional logic returns: true or false}
+    \State $clauses \leftarrow$ the set of clauses in the CNF representation of $s$ 
+    \State $symbols \leftarrow$ a list of the proposition symbols in $s$
+    \State \textbf{return} DPLL($clauses,symbols,\{\}$) 
+\EndProcedure \newline
+
+\Procedure{DPLL}{$clauses,symbols,model$} \Comment{returns true or false}
+
+    \If{every clause in $clauses$ is true in $model$} 
+        \State \textbf{return} $true$
+    \EndIf
+    \If{some clauses in $clauses$ is false in $model$}
+        \State \textbf{return} $false$
+    \EndIf
+
+    \State P,$value$ $\leftarrow$ FIND-PURE-SYMBOL($symbols,clauses,model$)
+    \If{P is non-null}
+        \State \textbf{return} DPLL($clauses,symbols -P, model \cup \{P=value\}$)
+    \EndIf
+    \State $P,value \leftarrow$ FIND-UNIT-CLAUSE($clauses,model$)
+    \If{P is non-null}
+        \State \textbf{return} DPLL($clauses,symbols-P,model \cup \{P = value\}$)
+    \EndIf
+    \State P$\leftarrow$ FIRST($symbols$); rest $\leftarrow$ REST($symbols$)
+
+    \State \textbf{return} DPLL($clauses,rest,model \cup \{P=true\}$) or DPLL($clauses,rest,model \cup \{P=false\}$)
+
+\EndProcedure
+
+\end{algorithmic}
+\end{algorithm}
+
+\textbf{The WalkSat Algorithm} is an incomplete, local search algorithm. The evaluation function of WalkSat is the \textbf{min-conflict heuristic} of minimising the number of unsatisfied clauses.
+
+The algorithm checks for satisfiability by randomly flipping the values of the variables. 
+
+There is a balance between greediness and randomness \newline 
+
+The below puesdocode for the algorithm takes the following inputs:
+clauses, a set of clauses in propositional logic
+p, the probability of choosing to do a "random walk" move, typically around 0.5
+$maxFlips$, number of flips allowed before giving up \newline
+
+And returns, a satisfying model or failure
+
+\begin{algorithm}
+\begin{algorithmic}
+
+\Procedure{WALK-SAT}{$clauses,p,maxFlips$}
+    \State $model \leftarrow$ a random assignment of $true/false$ to the symbols in $clauses$
+    \For{$i = 1 \: to \: maxFlips$}
+
+    \If{$model$ satisfies $clauses$}
+        \State \textbf{return} $model$
+    \EndIf
+
+    \State $clause \leftarrow$ a randomly selected clause from $clauses$ that is false in $model$ with probability $p$ flip the value in $model$ of a randomly selected symbol from $clause$ otherwise flip whichever symbol in $clause$ maximises the number of satisfied clauses
+    
+    \EndFor
+    \State \textbf{return} failure
+\EndProcedure \newline
+
+\end{algorithmic}
+\end{algorithm}
+
+\section{Resolution}
+
+\subsection{Forward Chaining}
+
+A forward-chaining algorithm starts with the atomic sentences in the knowledge base and applies Modus Ponenes in the forward direction, adding new atomic sentences, until no further inferences can be made. 
+
+Properties of forward chaining:
+\begin{itemize}
+    \item Sound and complete for first-order definite clauses (a definite clause has exactly one positive literal)
+    \item may not terminate in general if $\alpha$ is not entailed 
+    \item Entailment with definite clauses is semi-decidable 
+    \item Datalog = first-order definite clauses + no functions (FC terminates for Datalog in finite number of iterations)
+\end{itemize}
+
 
 \end{document}
