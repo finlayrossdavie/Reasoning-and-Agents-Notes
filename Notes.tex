@@ -281,7 +281,9 @@ Variable ordering in backtracking-search (SELECT-UNASSIGNED-VARIABLE) can be dec
 
 Value ordering (ORDER-DOMAIN-VALUES)can be done using various techniques such as \textbf{least constraining value} which chooses the value that rules out the fewest values in the remaining variables for a given variable. \newline 
 
-Inference (INFERENCE) allows one to potentially detect inevitable failure early. For example, \textbf{forward checking} keeps track of remaining legal values for unassigned variables and terminates the search when any variable has no legal values. Another form of inference, \textbf{constraint propagation} repeatedly enforces constrains locally . \newline \textbf{Arc consistency} checks if there is a value for X that makes the domain of Y empty before or after each assignment. The simplest form of propagation makes each arc consistent.
+Inference (INFERENCE) allows one to potentially detect inevitable failure early. For example, \textbf{forward checking} keeps track of remaining legal values for unassigned variables and terminates the search when any variable has no legal values. Another form of inference, \textbf{constraint propagation} repeatedly enforces constrains locally . \newline 
+
+The pair $(X,Y)$ of constraint variables is \textbf{arc consistent} if for each value $x \in D_X$ there exists a value $y \in D_Y$ such that the assignments $X=x$ and $Y=y$ satisfy all binary constraints between $X$ and $Y$. A CSP is arc consistent if all variable pairs are arc consistent. \newline
 
 The most popular algorithm to make every variable arc-consistent is called AC-3 which maintains a queue of arcs to consider. Initially, the queue contains all the arcs in the CSP. AC-3 then pops off an arbitrary arc $(X_i,X_j)$ from the queue and makes $X_i$ arc-consistent with respect to $X_j$. If this leaves $D_i$ unchanged, the algorithm just moves on to the next arc. If this makes $D_i$ smaller, then all arc $(X_k,X_i)$ where $X_k$ is a neighbor of $X_i$ are added to the queue since the change in $D_i$ might enable further reductions in the domains of $D_k$. If $D_i$ is revised down to nothing, the CSP has no consistent solution and AC-3 can return failure
 
@@ -293,7 +295,7 @@ The most popular algorithm to make every variable arc-consistent is called AC-3 
     \Comment{returns false if an inconsistency is found and true otherwise}
     \While{queue is not empty}
         \State $(X_i,X_j) \leftarrow$ REMOVE-FIRST(queue)
-        \If{REVISE($csp,X_i,X_j$)}
+        \If{REVISE($csp,X_i,X_j$)} 
             \If{size of $D_i = 0$}
                 \State \textbf{return} false
                 \For{each $X_k$ in $X_i.$NEIGHBORS - ${x_J}$}
@@ -323,6 +325,7 @@ The most popular algorithm to make every variable arc-consistent is called AC-3 
 \end{algorithmic}
 \end{algorithm}
 
+For REMOVE-FIRST or SELECT-UNASSIGNED-VARIABLE in the AC-3 and back-tracking search algorithms we may use a heurstic such as \textbf{minimum remaining values}, this chooses the variable that is most likely to cause a failure soon.  
 
 \section{Adversarial Search}
 
@@ -657,16 +660,18 @@ constant symbols $\rightarrow$ objects
 predicate symbols $\rightarrow$ relation
 function symbols $\rightarrow$ functions \newline 
 
-Universal quantification
+\textbf{Universal quantification}
 $\forall <variables>.<formula>$
-$\forall x.P$ is true in an interpretation m if and only if P is true with x being each possible object in the interpretation. 
+$\forall x.P$ is true in an interpretation m if and only if P is true with x being each possible object in the interpretation. \newline
 
-Existential quantification
+\textbf{Existential quantification}
 $\exists <variables>.<formula>$
-$\exists x. P$ is true for an interpretation m if and only if P is true with x being some possible object in the interpretation. Roughly speaking this is equivalent to the disjuntion of instantiations of P. 
+$\exists x. P$ is true for an interpretation m if and only if P is true with x being some possible object in the interpretation. Roughly speaking this is equivalent to the disjuntion of instantiations of P. \newline
 
-Equality 
-$term_1 = term_2$ is true under a given interpretation if and only if $term_1$ and $term_2$ refer to the same obect
+\textbf{Equality}
+$term_1 = term_2$ is true under a given interpretation if and only if $term_1$ and $term_2$ refer to the same object. \newline
+
+
 
 
 \end{document}
