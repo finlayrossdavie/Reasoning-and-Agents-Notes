@@ -119,7 +119,12 @@ Nodes are taken from the frontier.
 
 \subsection{Uninformed search}
 
+
+
 \textbf{Uninformed search} strategies have no additional information about states beyond that provided in the problem definition. 
+
+A search algorithm is \textbf{complete} if it always finds a solution when one exists. A search algorithm is \textbf{optimal} if any found solution is optimal (has lowest possible cost).
+
 
 \subsubsection{Breadth-first search}
 
@@ -522,6 +527,8 @@ There are two families of efficient algorithmns for propositional inference:
     \item Incomplete local search algorithms (WalkSAT algorithm)
 \end{itemize}
 
+A statisfiability is \textbf{complete} if it terminates (returns true or false after finite time) for every sentence. An algorithm is \textbf{sound} if the returned result is correct.
+
 Both of these algorithmns manipulate formulae in \textbf{conjunctive normal form(CNF)}
 
 In CNF a sentence is a conjunction of clauses whose satisfiability is to be determined. A clause is a disjuntion of literals.  \newline
@@ -675,6 +682,79 @@ $\exists x. P$ is true for an interpretation m if and only if P is true with x b
 
 \textbf{Equality}
 $term_1 = term_2$ is true under a given interpretation if and only if $term_1$ and $term_2$ refer to the same object. \newline
+
+The \textbf{deduction theorem} states that if $\alpha |= \beta$ iff $\alpha \Rightarrow \beta$ is valid
+
+\subsection{Inference in FOL}
+
+An inference rule for a universal instantiation (UI) is that we can infer any sentence by substituting a \textbf{ground term} for the variable i.e. $\frac{\forall v, a}{SUBST([v/g]),a}$. 
+
+An inference rule for a existential instantiation (EI) is that we can replace the variable by a single new \textbf{constant symbol} called a \textbf{Skolem constant}. 
+
+UI can be applied many times to produce many different outcomes while EI can be applied once, then the existentially quantified sentence could be discarded. The new knowledge base (KB) is \textbf{inferentially equivalent} to the old. Every FOL knowledge base can be propositionalised so as to preserve entailment. \newline
+
+\textbf{Theorem:} If a sentence $\alpha$ is entailed by a FOL KB, it is entailed by a finite subset of the propositionalised KB \newline
+
+\textbf{Theorem:} Entailment for FOL is semi-decidable i.e. algorithms exist that say yes to every entailed sentence, but no algorithm exist that also says no to every non-entailed sentence
+
+\textbf{Modus Ponens} (Propositional Logic) is defined as $$\frac{P \: \: \: P \Rightarrow Q}{Q}$$
+
+We can define generalised modus ponens as $$\frac{p_1', p_2',...,p_n', \: \: (p_1 \wedge p_2 \wedge ... \wedge p_n \Rightarrow q)}{SUBST(\theta, q)}$$
+
+\subsubsection{Unification}
+
+The goal of unification is to make different logical expressions look identical. The unify algorithm takes two sentences and returns a unifier for them if one exists $$UNIFY(p, q) = \theta$$ where $SUBST(\theta, p) = SUBST(\theta, q)$
+
+In FOL there is a single most general unifier (MGU) that is unique up to renaming of variables. The most general unifier is the least constrained substitution that makes two clauses unify with each other. To find the MGU we can break the process down into the following steps: Decomposition, Conflict, Eliminate, Delete, Switch, Coalesce, occurs check. 
+
+The step of decomposition is implemented as follows: \newline
+Given: $$f(s_1,...,s_n) = f(t_1,...,t_n)$$, replace with $$s_1 =^? t_1,...,s_n =^? t_n$$
+
+\subsubsection{Resolution-based Inference}
+
+Inference procedures based on resolution work by using the principle of proof by contradiction. That is, to show that $KB |= \alpha$, we show that $KB \wedge \neg \alpha$ is unsatisfiable. 
+
+A \textbf{definite clause} has exactly one positive literal. 
+
+\textbf{Forward chaining} is an inference algorithm which is sound and complete for first-order definite clauses. FC may not terminate in general is $\alpha$ is not entailed. Entailment with definite clauses is semi-decidable. In incremental forward chaining there is no need to match a rule on iteration $k$ if a premise wasn't added on iteration $k-1$. \newline
+
+\textbf{Backward chaining} is a depth-first recursive proof search in which space is linear in the size of the proof. BC is incomplete due to infinite loops. It is also inefficient due to repeated sub-goals.
+
+\textbf{Ground Binary Resolution} is given has $$\frac{C \vee P \: \: \: \: D \vee \neg P}{C \vee D}$$. Note that if both C and D are empty then the resolution deduces the empty clause, i.e. false.  \newline
+
+The \textbf{ground resolution theorem} is given as: If a set of clauses is unsatisfiable, then the resolution closure of those clauses contains the empty clause. 
+
+Note that binary resolution is complete when combined with factoring. 
+
+The \textbf{non-ground binary resolution} is given as, $$\frac{C \vee P \: \: \: \: D \vee \neg P'}{(C \vee D) \theta}$$, where $\theta$ is the mgu of P and P'. 
+
+The Resolution algorithm takes an input a set of clauses and returns true if that set it satisfiable. It does this by performing a sequence of \textbf{resolution steps}, where each step consists of identifying two clauses of the form $c_1 = C \vee P$ and $c_2 = D \vee \not P$ and then adding $c = C \vee D$ to the \textbf{resolvent clause} \newline
+
+The resolution algorithm will either terminate via a refutation step, or via clause saturation. When the resolvent $P \vee Q$ is the empty clause, which is logically equivalent to false we call that the refuation step and the algorithm is said to have performed a \textbf{resolution proof} (the set of clauses is unsatisfiable). 
+
+Resolution takes two clauses and produces a new clause containing all the literals of the two original clauses except the two complementary literals. The resolution rule applies only to clauses (disjunctions of literals). 
+
+
+A resolution-based theorem prover can, for any sentences $\alpha$ and $\beta$ in propositional logic, decide whether $\alpha |= \beta$ and thus resolution forms the basis for a family of complete inference procecures. 
+
+We can summarise a resolution based algorithm as: First, ($KB \wedge \neg \alpha$) is converted into CNF.The resolution rule is applied to the CNF clauses. Each pair that contains complementary literals is resolved to produce a new clause, which is added to the set if it is not already present. The process continues until one of the two following things happens:
+\begin{enumerate}
+    \item There are no new clauses that can be added, in which case KB does not entail $\alpha$
+    \item Two clauses reslove to yield the empty clause, in which case the KB entails $\alpha$
+
+    
+\end{enumerate}
+
+
+
+\subsubsection{Situation Calculus}
+
+We can introduce the notion of situations, which are logical terms. We have an initial situation and all situations generated by applying an action to a situation. We state facts about situations by relativizing predictions to situations. One can think of a situation as a sequence, or history, of actions. Two situations are only the same if their start and actions are the same
+
+A function or relation that can vary from one situation to the next is a \textbf{fluent}. Each fluent is described with a \textbf{successor-state axiom} that says what happens to the fluent, depending on what action is taken. To describe how the world changes we can define \textbf{effect axioms} that specify the outcome of an action at the next time step. We use \textbf{frame axioms} to explicitly assert all the propositions that remain the same when an effect axiom is applied. 
+
+In situation calculus we axiomatize all of our actions then use a general theorem prover to prove that a situation exists in which our goal is true.
+
 
 \section{Symbolic Planning}
 
